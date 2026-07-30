@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="530" viewBox="0 35 1120 530">
+<rect width="100%" height="100%" fill="white"/>
+<defs><clipPath id="extension-panel-0-0"><rect x="120" y="55" width="360" height="185"/></clipPath></defs>
+<rect x="120" y="55" width="360" height="185" fill="none" stroke="#555"/>
+<line x1="120" y1="240.0" x2="480" y2="240.0" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="244.0" text-anchor="end" font-family="sans-serif" font-size="22">-0.70</text>
+<line x1="120" y1="193.8" x2="480" y2="193.8" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="197.8" text-anchor="end" font-family="sans-serif" font-size="22">0.12</text>
+<line x1="120" y1="147.5" x2="480" y2="147.5" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="151.5" text-anchor="end" font-family="sans-serif" font-size="22">0.95</text>
+<line x1="120" y1="101.3" x2="480" y2="101.3" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="105.3" text-anchor="end" font-family="sans-serif" font-size="22">1.77</text>
+<line x1="120" y1="55.0" x2="480" y2="55.0" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="59.0" text-anchor="end" font-family="sans-serif" font-size="22">2.60</text>
+<text class="tick-label" x="120.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.00</text>
+<text class="tick-label" x="210.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.25</text>
+<text class="tick-label" x="300.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.50</text>
+<text class="tick-label" x="390.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.75</text>
+<text class="tick-label" x="480.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.99</text>
+<polyline points="120.0,73.6 123.6,75.3 127.2,77.0 130.8,78.7 134.4,80.4 138.0,82.2 141.6,83.9 145.2,85.6 148.8,87.3 152.4,89.0 156.0,90.8 159.6,92.5 163.2,94.2 166.8,95.9 170.4,97.7 174.0,99.4 177.6,101.1 181.2,102.8 184.8,104.5 188.4,106.3 192.0,108.0 195.6,109.7 199.2,111.4 202.8,113.2 206.4,114.9 210.0,116.6 213.6,118.3 217.2,120.0 220.8,121.8 224.4,123.5 228.0,125.2 231.6,126.9 235.2,128.6 238.8,130.4 242.4,132.1 246.0,133.8 249.6,135.5 253.2,137.3 256.8,139.0 260.4,140.7 264.0,142.4 267.6,144.1 271.2,145.9 274.8,147.6 278.4,149.3 282.0,151.0 285.6,152.7 289.2,154.5 292.8,156.2 296.4,157.9 300.0,159.6 303.6,161.4 307.2,163.1 310.8,164.8 314.4,166.5 318.0,168.2 321.6,170.0 325.2,171.7 328.8,173.4 332.4,175.1 336.0,176.9 339.6,178.6 343.2,180.3 346.8,182.0 350.4,183.7 354.0,185.5 357.6,187.2 361.2,188.9 364.8,190.6 368.4,192.3 372.0,194.1 375.6,195.8 379.2,197.5 382.8,199.2 386.4,201.0 390.0,202.7 393.6,204.4 397.2,206.1 400.8,207.8 404.4,209.6 408.0,211.3 411.6,213.0 415.2,214.7 418.8,216.4 422.4,218.2 426.0,219.9 429.6,221.6 433.2,223.3 436.8,225.1 440.4,226.8 444.0,228.5 447.6,230.2 451.2,231.9 454.8,233.7 458.4,235.4 462.0,237.1 465.6,238.8 469.2,240.6 472.8,242.3 476.4,244.0 480.0,245.7" fill="none" stroke="#2563eb" stroke-width="2" clip-path="url(#extension-panel-0-0)"/>
+<circle cx="437.2" cy="226.3" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="435.4" cy="224.8" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="432.8" cy="222.2" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="431.0" cy="221.9" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<text x="321.6" y="224.9" text-anchor="middle" font-family="sans-serif" font-size="21.5" font-style="italic" fill="#2563eb">L≤2048: q=0.02</text>
+<text x="128" y="75" font-family="sans-serif" font-size="27.9">σ=1.75, Rₚ</text>
+<text class="axis-label" x="300.0" y="288" text-anchor="middle" font-family="sans-serif" font-size="29"><tspan font-style="italic">L</tspan><tspan baseline-shift="super" font-size="18.0">−q</tspan></text>
+<text x="35" y="147.5" text-anchor="middle" font-family="sans-serif" font-size="25" transform="rotate(-90 35 147.5)">Rₚ(L)</text>
+<defs><clipPath id="extension-panel-0-1"><rect x="680" y="55" width="360" height="185"/></clipPath></defs>
+<rect x="680" y="55" width="360" height="185" fill="none" stroke="#555"/>
+<line x1="680" y1="240.0" x2="1040" y2="240.0" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="244.0" text-anchor="end" font-family="sans-serif" font-size="22">-0.70</text>
+<line x1="680" y1="193.8" x2="1040" y2="193.8" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="197.8" text-anchor="end" font-family="sans-serif" font-size="22">0.12</text>
+<line x1="680" y1="147.5" x2="1040" y2="147.5" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="151.5" text-anchor="end" font-family="sans-serif" font-size="22">0.95</text>
+<line x1="680" y1="101.3" x2="1040" y2="101.3" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="105.3" text-anchor="end" font-family="sans-serif" font-size="22">1.77</text>
+<line x1="680" y1="55.0" x2="1040" y2="55.0" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="59.0" text-anchor="end" font-family="sans-serif" font-size="22">2.60</text>
+<text class="tick-label" x="680.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.00</text>
+<text class="tick-label" x="770.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.02</text>
+<text class="tick-label" x="860.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.04</text>
+<text class="tick-label" x="950.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.06</text>
+<text class="tick-label" x="1040.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="22">0.08</text>
+<polyline points="680.0,181.9 683.6,182.4 687.2,183.0 690.8,183.5 694.4,184.1 698.0,184.6 701.6,185.2 705.2,185.7 708.8,186.3 712.4,186.9 716.0,187.4 719.6,188.0 723.2,188.5 726.8,189.1 730.4,189.6 734.0,190.2 737.6,190.7 741.2,191.3 744.8,191.8 748.4,192.4 752.0,192.9 755.6,193.5 759.2,194.0 762.8,194.6 766.4,195.1 770.0,195.7 773.6,196.3 777.2,196.8 780.8,197.4 784.4,197.9 788.0,198.5 791.6,199.0 795.2,199.6 798.8,200.1 802.4,200.7 806.0,201.2 809.6,201.8 813.2,202.3 816.8,202.9 820.4,203.4 824.0,204.0 827.6,204.5 831.2,205.1 834.8,205.7 838.4,206.2 842.0,206.8 845.6,207.3 849.2,207.9 852.8,208.4 856.4,209.0 860.0,209.5 863.6,210.1 867.2,210.6 870.8,211.2 874.4,211.7 878.0,212.3 881.6,212.8 885.2,213.4 888.8,213.9 892.4,214.5 896.0,215.0 899.6,215.6 903.2,216.2 906.8,216.7 910.4,217.3 914.0,217.8 917.6,218.4 921.2,218.9 924.8,219.5 928.4,220.0 932.0,220.6 935.6,221.1 939.2,221.7 942.8,222.2 946.4,222.8 950.0,223.3 953.6,223.9 957.2,224.4 960.8,225.0 964.4,225.6 968.0,226.1 971.6,226.7 975.2,227.2 978.8,227.8 982.4,228.3 986.0,228.9 989.6,229.4 993.2,230.0 996.8,230.5 1000.4,231.1 1004.0,231.6 1007.6,232.2 1011.2,232.7 1014.8,233.3 1018.4,233.8 1022.0,234.4 1025.6,235.0 1029.2,235.5 1032.8,236.1 1036.4,236.6 1040.0,237.2" fill="none" stroke="#2563eb" stroke-width="2" clip-path="url(#extension-panel-0-1)"/>
+<circle cx="961.1" cy="226.3" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="956.1" cy="224.8" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="949.3" cy="222.2" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="944.7" cy="221.9" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<text x="896.0" y="192.9" text-anchor="middle" font-family="sans-serif" font-size="21.5" font-style="italic" fill="#2563eb">L≤2048: q=0.0001</text>
+<text x="688" y="75" font-family="sans-serif" font-size="27.9">σ=1.75, Rₚ</text>
+<text class="axis-label" x="860.0" y="288" text-anchor="middle" font-family="sans-serif" font-size="29">1/log(<tspan font-style="italic">L</tspan>/<tspan font-style="italic">q</tspan>)</text>
+<text x="595" y="147.5" text-anchor="middle" font-family="sans-serif" font-size="25" transform="rotate(-90 595 147.5)">Rₚ(L)</text>
+<defs><clipPath id="extension-panel-1-0"><rect x="120" y="310" width="360" height="185"/></clipPath></defs>
+<rect x="120" y="310" width="360" height="185" fill="none" stroke="#555"/>
+<line x1="120" y1="495.0" x2="480" y2="495.0" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="499.0" text-anchor="end" font-family="sans-serif" font-size="22">-0.35</text>
+<line x1="120" y1="448.8" x2="480" y2="448.8" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="452.8" text-anchor="end" font-family="sans-serif" font-size="22">0.55</text>
+<line x1="120" y1="402.5" x2="480" y2="402.5" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="406.5" text-anchor="end" font-family="sans-serif" font-size="22">1.45</text>
+<line x1="120" y1="356.2" x2="480" y2="356.2" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="360.2" text-anchor="end" font-family="sans-serif" font-size="22">2.35</text>
+<line x1="120" y1="310.0" x2="480" y2="310.0" stroke="#e5e7eb"/>
+<text class="tick-label" x="112" y="314.0" text-anchor="end" font-family="sans-serif" font-size="22">3.25</text>
+<text class="tick-label" x="120.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.00</text>
+<text class="tick-label" x="210.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.15</text>
+<text class="tick-label" x="300.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.31</text>
+<text class="tick-label" x="390.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.46</text>
+<text class="tick-label" x="480.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.62</text>
+<polyline points="120.0,463.8 123.6,464.1 127.2,464.4 130.8,464.7 134.4,465.0 138.0,465.3 141.6,465.6 145.2,465.9 148.8,466.2 152.4,466.5 156.0,466.8 159.6,467.1 163.2,467.4 166.8,467.6 170.4,467.9 174.0,468.2 177.6,468.5 181.2,468.8 184.8,469.1 188.4,469.4 192.0,469.7 195.6,470.0 199.2,470.3 202.8,470.6 206.4,470.9 210.0,471.2 213.6,471.5 217.2,471.8 220.8,472.1 224.4,472.4 228.0,472.7 231.6,472.9 235.2,473.2 238.8,473.5 242.4,473.8 246.0,474.1 249.6,474.4 253.2,474.7 256.8,475.0 260.4,475.3 264.0,475.6 267.6,475.9 271.2,476.2 274.8,476.5 278.4,476.8 282.0,477.1 285.6,477.4 289.2,477.7 292.8,478.0 296.4,478.2 300.0,478.5 303.6,478.8 307.2,479.1 310.8,479.4 314.4,479.7 318.0,480.0 321.6,480.3 325.2,480.6 328.8,480.9 332.4,481.2 336.0,481.5 339.6,481.8 343.2,482.1 346.8,482.4 350.4,482.7 354.0,483.0 357.6,483.3 361.2,483.5 364.8,483.8 368.4,484.1 372.0,484.4 375.6,484.7 379.2,485.0 382.8,485.3 386.4,485.6 390.0,485.9 393.6,486.2 397.2,486.5 400.8,486.8 404.4,487.1 408.0,487.4 411.6,487.7 415.2,488.0 418.8,488.3 422.4,488.6 426.0,488.9 429.6,489.1 433.2,489.4 436.8,489.7 440.4,490.0 444.0,490.3 447.6,490.6 451.2,490.9 454.8,491.2 458.4,491.5 462.0,491.8 465.6,492.1 469.2,492.4 472.8,492.7 476.4,493.0 480.0,493.3" fill="none" stroke="#2563eb" stroke-width="2" clip-path="url(#extension-panel-1-0)"/>
+<circle cx="358.5" cy="483.2" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="349.4" cy="483.5" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="337.2" cy="481.7" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="328.9" cy="480.9" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<text x="336.0" y="465.9" text-anchor="middle" font-family="sans-serif" font-size="21.5" font-style="italic" fill="#2563eb">L≤2048: q=0.135</text>
+<text x="128" y="330" font-family="sans-serif" font-size="27.9">σ=2, Rₚ</text>
+<text class="axis-label" x="300.0" y="543" text-anchor="middle" font-family="sans-serif" font-size="29"><tspan font-style="italic">L</tspan><tspan baseline-shift="super" font-size="18.0">−q</tspan></text>
+<text x="35" y="402.5" text-anchor="middle" font-family="sans-serif" font-size="25" transform="rotate(-90 35 402.5)">Rₚ(L)</text>
+<defs><clipPath id="extension-panel-1-1"><rect x="680" y="310" width="360" height="185"/></clipPath></defs>
+<rect x="680" y="310" width="360" height="185" fill="none" stroke="#555"/>
+<line x1="680" y1="495.0" x2="1040" y2="495.0" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="499.0" text-anchor="end" font-family="sans-serif" font-size="22">-0.35</text>
+<line x1="680" y1="448.8" x2="1040" y2="448.8" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="452.8" text-anchor="end" font-family="sans-serif" font-size="22">0.55</text>
+<line x1="680" y1="402.5" x2="1040" y2="402.5" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="406.5" text-anchor="end" font-family="sans-serif" font-size="22">1.45</text>
+<line x1="680" y1="356.2" x2="1040" y2="356.2" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="360.2" text-anchor="end" font-family="sans-serif" font-size="22">2.35</text>
+<line x1="680" y1="310.0" x2="1040" y2="310.0" stroke="#e5e7eb"/>
+<text class="tick-label" x="672" y="314.0" text-anchor="end" font-family="sans-serif" font-size="22">3.25</text>
+<text class="tick-label" x="680.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.00</text>
+<text class="tick-label" x="770.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.02</text>
+<text class="tick-label" x="860.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.04</text>
+<text class="tick-label" x="950.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.06</text>
+<text class="tick-label" x="1040.0" y="517" text-anchor="middle" font-family="sans-serif" font-size="22">0.08</text>
+<polyline points="680.0,441.6 683.6,442.2 687.2,442.7 690.8,443.2 694.4,443.8 698.0,444.3 701.6,444.8 705.2,445.4 708.8,445.9 712.4,446.4 716.0,447.0 719.6,447.5 723.2,448.0 726.8,448.6 730.4,449.1 734.0,449.6 737.6,450.2 741.2,450.7 744.8,451.3 748.4,451.8 752.0,452.3 755.6,452.9 759.2,453.4 762.8,453.9 766.4,454.5 770.0,455.0 773.6,455.5 777.2,456.1 780.8,456.6 784.4,457.1 788.0,457.7 791.6,458.2 795.2,458.7 798.8,459.3 802.4,459.8 806.0,460.3 809.6,460.9 813.2,461.4 816.8,461.9 820.4,462.5 824.0,463.0 827.6,463.5 831.2,464.1 834.8,464.6 838.4,465.1 842.0,465.7 845.6,466.2 849.2,466.7 852.8,467.3 856.4,467.8 860.0,468.3 863.6,468.9 867.2,469.4 870.8,469.9 874.4,470.5 878.0,471.0 881.6,471.5 885.2,472.1 888.8,472.6 892.4,473.1 896.0,473.7 899.6,474.2 903.2,474.7 906.8,475.3 910.4,475.8 914.0,476.3 917.6,476.9 921.2,477.4 924.8,478.0 928.4,478.5 932.0,479.0 935.6,479.6 939.2,480.1 942.8,480.6 946.4,481.2 950.0,481.7 953.6,482.2 957.2,482.8 960.8,483.3 964.4,483.8 968.0,484.4 971.6,484.9 975.2,485.4 978.8,486.0 982.4,486.5 986.0,487.0 989.6,487.6 993.2,488.1 996.8,488.6 1000.4,489.2 1004.0,489.7 1007.6,490.2 1011.2,490.8 1014.8,491.3 1018.4,491.8 1022.0,492.4 1025.6,492.9 1029.2,493.4 1032.8,494.0 1036.4,494.5 1040.0,495.0" fill="none" stroke="#2563eb" stroke-width="2" clip-path="url(#extension-panel-1-1)"/>
+<circle cx="961.1" cy="483.2" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="956.1" cy="483.5" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="949.3" cy="481.7" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<circle cx="944.7" cy="480.9" r="3.8" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+<text x="896.0" y="451.9" text-anchor="middle" font-family="sans-serif" font-size="21.5" font-style="italic" fill="#2563eb">L≤2048: q=0.0001</text>
+<text x="688" y="330" font-family="sans-serif" font-size="27.9">σ=2, Rₚ</text>
+<text class="axis-label" x="860.0" y="543" text-anchor="middle" font-family="sans-serif" font-size="29">1/log(<tspan font-style="italic">L</tspan>/<tspan font-style="italic">q</tspan>)</text>
+<text x="595" y="402.5" text-anchor="middle" font-family="sans-serif" font-size="25" transform="rotate(-90 595 402.5)">Rₚ(L)</text>
+</svg>

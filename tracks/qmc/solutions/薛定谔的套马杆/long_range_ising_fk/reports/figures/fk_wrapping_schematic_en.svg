@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="350" viewBox="0 0 720 350">
+  <rect width="720" height="350" fill="#ffffff"/>
+  <defs>
+    <style>
+      .frame { fill: #f8fafc; stroke: #334155; stroke-width: 2.5; }
+      .bond { fill: none; stroke: #2563eb; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+      .small { fill: none; stroke: #94a3b8; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+      .node { fill: #2563eb; }
+      .ghost { fill: #94a3b8; }
+      .label { font-family: sans-serif; font-size: 23px; fill: #172554; text-anchor: middle; }
+      .sector { font-family: serif; font-style: italic; font-size: 25px; fill: #6d4aff; text-anchor: middle; }
+      .arrow { fill: none; stroke: #6d4aff; stroke-width: 3; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#6d4aff"/>
+    </marker>
+  </defs>
+
+  <!-- R0: all clusters are contractible -->
+  <g transform="translate(12 22)">
+    <rect class="frame" x="18" y="36" width="200" height="200" rx="4"/>
+    <path class="small" d="M52 78 L83 65 L105 91 L91 119"/>
+    <circle class="ghost" cx="52" cy="78" r="6"/><circle class="ghost" cx="83" cy="65" r="6"/>
+    <circle class="ghost" cx="105" cy="91" r="6"/><circle class="ghost" cx="91" cy="119" r="6"/>
+    <path class="bond" d="M143 145 L173 125 L196 157 L176 184 L145 177"/>
+    <circle class="node" cx="143" cy="145" r="6"/><circle class="node" cx="173" cy="125" r="6"/>
+    <circle class="node" cx="196" cy="157" r="6"/><circle class="node" cx="176" cy="184" r="6"/>
+    <circle class="node" cx="145" cy="177" r="6"/>
+    <path class="small" d="M56 190 L78 205 L103 190"/>
+    <circle class="ghost" cx="56" cy="190" r="6"/><circle class="ghost" cx="78" cy="205" r="6"/>
+    <circle class="ghost" cx="103" cy="190" r="6"/>
+    <text class="label" x="118" y="272">no wrapping</text>
+    <text class="sector" x="118" y="306">R₀ sector</text>
+  </g>
+
+  <!-- R1: one non-contractible loop -->
+  <g transform="translate(246 22)">
+    <rect class="frame" x="18" y="36" width="200" height="200" rx="4"/>
+    <path class="bond" d="M18 139 L52 126 L88 145 L124 119 L162 137 L218 126"/>
+    <circle class="node" cx="18" cy="139" r="6"/><circle class="node" cx="52" cy="126" r="6"/>
+    <circle class="node" cx="88" cy="145" r="6"/><circle class="node" cx="124" cy="119" r="6"/>
+    <circle class="node" cx="162" cy="137" r="6"/><circle class="node" cx="218" cy="126" r="6"/>
+    <path class="small" d="M72 74 L96 88 L116 68"/>
+    <circle class="ghost" cx="72" cy="74" r="6"/><circle class="ghost" cx="96" cy="88" r="6"/>
+    <circle class="ghost" cx="116" cy="68" r="6"/>
+    <path class="arrow" d="M42 21 C82 -8 158 -8 198 21"/>
+    <text class="label" x="118" y="272">one direction</text>
+    <text class="sector" x="118" y="306">single wrapping</text>
+  </g>
+
+  <!-- R2: one connected cluster winds around both cycles -->
+  <g transform="translate(480 22)">
+    <rect class="frame" x="18" y="36" width="200" height="200" rx="4"/>
+    <path class="bond" d="M18 141 L55 126 L92 145 L126 123 L164 139 L218 125"/>
+    <path class="bond" d="M126 36 L112 78 L126 123 L106 167 L121 236"/>
+    <circle class="node" cx="18" cy="141" r="6"/><circle class="node" cx="55" cy="126" r="6"/>
+    <circle class="node" cx="92" cy="145" r="6"/><circle class="node" cx="126" cy="123" r="6"/>
+    <circle class="node" cx="164" cy="139" r="6"/><circle class="node" cx="218" cy="125" r="6"/>
+    <circle class="node" cx="126" cy="36" r="6"/><circle class="node" cx="112" cy="78" r="6"/>
+    <circle class="node" cx="106" cy="167" r="6"/><circle class="node" cx="121" cy="236" r="6"/>
+    <path class="arrow" d="M42 21 C82 -8 158 -8 198 21"/>
+    <path class="arrow" d="M206 58 C230 96 230 176 206 214"/>
+    <text class="label" x="118" y="272">both directions</text>
+    <text class="sector" x="118" y="306">R₂ sector</text>
+  </g>
+</svg>

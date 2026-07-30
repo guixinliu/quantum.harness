@@ -26,6 +26,17 @@ forecasts = read_csv("distinguishable_size.csv")
 extension_fits = read_csv("extension_comparison_fits.csv")
 with open(os.path.join(base_analysis, "aggregated.csv"), encoding="utf-8") as handle:
     base_rows = list(csv.DictReader(handle))
+with open(os.path.join(base_analysis, "crossings.csv"), encoding="utf-8") as handle:
+    crossing_rows = list(csv.DictReader(handle))
+nn_analysis = os.path.join(root, "results", "nn_v3_20260730", "analysis")
+with open(os.path.join(nn_analysis, "nn_eta_input.csv"), encoding="utf-8") as handle:
+    nn_eta_rows = list(csv.DictReader(handle))
+with open(os.path.join(nn_analysis, "nn_eta_power_law_fit.csv"), encoding="utf-8") as handle:
+    nn_eta_fit = {
+        row["parameter"]: float(row["value"])
+        for row in csv.DictReader(handle)
+        if row["value"]
+    }
 colors = {1.75: "#2563eb", 1.875: "#16a34a", 2.0: "#dc2626", 2.5: "#7c3aed"}
 
 
@@ -40,6 +51,96 @@ def match_figure_two_font_scale(content, width):
     return re.sub(r'font-size="([0-9.]+)"', scaled, content)
 
 
+def ppt_crop(
+    content,
+    y,
+    height,
+    font_scale=2.15,
+    tick_font=None,
+    axis_font=None,
+    remove_rotated=False,
+    rotated_font=None,
+    rotated_x_shift=0,
+):
+    """Crop a report SVG into a title-free, projector-readable PPT panel."""
+    width_match = re.search(r'width="([0-9.]+)"', content)
+    if width_match is None:
+        raise ValueError("SVG width not found")
+    width = float(width_match.group(1))
+    lines = content.splitlines()
+    lines[0] = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width:g}" '
+        f'height="{height:g}" viewBox="0 {y:g} {width:g} {height:g}">'
+    )
+    lines = [
+        line
+        for line in lines
+        if not (
+            "<text" in line
+            and (' y="27"' in line or ' y="29"' in line)
+            and 'text-anchor="middle"' in line
+        )
+    ]
+    if remove_rotated:
+        lines = [line for line in lines if 'transform="rotate(-90' not in line]
+
+    def scaled(match):
+        size = float(match.group(1))
+        return f'font-size="{max(18.0, size * font_scale):.1f}"'
+
+    content = re.sub(r'font-size="([0-9.]+)"', scaled, "\n".join(lines))
+    if tick_font is not None:
+        content = re.sub(
+            r'(<text class="tick-label"[^>]*font-size=")[0-9.]+(")',
+            rf'\g<1>{tick_font:g}\2',
+            content,
+        )
+    if axis_font is not None:
+        content = re.sub(
+            r'(<text class="axis-label"[^>]*font-size=")[0-9.]+(")',
+            rf'\g<1>{axis_font:g}\2',
+            content,
+        )
+    if rotated_font is not None:
+        adjusted = []
+        for line in content.splitlines():
+            if 'transform="rotate(-90' in line:
+                x_match = re.search(r'x="([0-9.]+)"', line)
+                if x_match is not None:
+                    old_x = float(x_match.group(1))
+                    new_x = old_x + rotated_x_shift
+                    line = line.replace(
+                        f'x="{x_match.group(1)}"', f'x="{new_x:g}"', 1
+                    )
+                    line = line.replace(
+                        f'rotate(-90 {x_match.group(1)} ',
+                        f'rotate(-90 {new_x:g} ',
+                    )
+                line = re.sub(
+                    r'font-size="[0-9.]+"',
+                    f'font-size="{rotated_font:g}"',
+                    line,
+                    count=1,
+                )
+            adjusted.append(line)
+        content = "\n".join(adjusted)
+    return content
+
+
+def ppt_mask_edges(content, top=None, bottom=None, replacements=()):
+    """Hide glyph overhang from adjacent rows after a viewBox crop."""
+    for source, target in replacements:
+        content = content.replace(source, target)
+    masks = []
+    if top is not None:
+        y, height = top
+        masks.append(f'<rect x="0" y="{y}" width="1120" height="{height}" fill="white"/>')
+    if bottom is not None:
+        y, height = bottom
+        masks.append(f'<rect x="0" y="{y}" width="1120" height="{height}" fill="white"/>')
+    return content.replace("</svg>", "\n" + "\n".join(masks) + "\n</svg>")
+
+
 def sx(log_l, x0, width, lo=6, hi=11):
     return x0 + (log_l - lo) / (hi - lo) * width
 
@@ -48,7 +149,7 @@ def sy(value, y0, height, lo, hi):
     return y0 + height - (value - lo) / (hi - lo) * height
 
 
-def finite_size_figure():
+def finite_size_figure(ppt=False):
     width, height = 1120, 430
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
@@ -61,7 +162,12 @@ def finite_size_figure():
         svg.append(f'<line x1="{x}" y1="57" x2="{x+28}" y2="57" stroke="{colors[sigma]}" stroke-width="3"/>')
         svg.append(f'<text x="{x+36}" y="62" font-family="sans-serif" font-size="12">σ={sigma:g}</text>')
     for p, (obs, label, ymin, ymax) in enumerate(panels):
-        x0, y0, pw, ph = 70 + 545 * p, 82, 450, 273
+        if ppt:
+            # Keep a generous central gutter after PPT font enlargement so the
+            # right panel's y label cannot intrude into the left panel.
+            x0, y0, pw, ph = 120 + 560 * p, 82, 390, 273
+        else:
+            x0, y0, pw, ph = 70 + 545 * p, 82, 450, 273
         svg.append(f'<rect x="{x0}" y="{y0}" width="{pw}" height="{ph}" fill="none" stroke="#555"/>')
         for tick in range(6, 12):
             x = sx(tick, x0, pw)
@@ -194,28 +300,42 @@ def extrapolation_figure():
     return "\n".join(svg)
 
 
-def eta_scaling_figure():
-    width, height = 900, 490
+def eta_scaling_figure(ppt=False):
+    if ppt:
+        width, height = 720, 390
+        x0, y0, pw, ph = 112, 18, 580, 300
+        tick_font, axis_font, legend_font = 24, 24, 24
+        marker_radius, line_width = 5, 3
+        ylabel_x = 20
+    else:
+        width, height = 900, 490
+        x0, y0, pw, ph = 90, 55, 740, 345
+        tick_font, axis_font, legend_font = 12, 12, 12
+        marker_radius, line_width = 4, 2
+        ylabel_x = 28
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         '<rect width="100%" height="100%" fill="white"/>',
-        '<text x="450" y="27" text-anchor="middle" font-family="sans-serif" font-size="18">χ(L)/L² 的临界幂律拟合</text>',
     ]
-    x0, y0, pw, ph = 90, 55, 740, 345
+    if not ppt:
+        svg.append('<text x="450" y="27" text-anchor="middle" font-family="sans-serif" font-size="18">χ(L)/L² 的临界幂律拟合</text>')
     svg.append(f'<rect x="{x0}" y="{y0}" width="{pw}" height="{ph}" fill="none" stroke="#555"/>')
     for tick in (64, 128, 256, 512):
         x = x0 + (math.log2(tick) - 6) / 3 * pw
         svg.append(f'<line x1="{x:.1f}" y1="{y0+ph}" x2="{x:.1f}" y2="{y0+ph+5}" stroke="#555"/>')
-        svg.append(f'<text x="{x:.1f}" y="{y0+ph+22}" text-anchor="middle" font-family="sans-serif" font-size="12">{tick}</text>')
+        tick_y = y0 + ph + (26 if ppt else 22)
+        svg.append(f'<text x="{x:.1f}" y="{tick_y}" text-anchor="middle" font-family="sans-serif" font-size="{tick_font}">{tick}</text>')
     logy_min, logy_max = math.log10(0.025), math.log10(0.35)
     for tick in (0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3):
         y = sy(math.log10(tick), y0, ph, logy_min, logy_max)
         svg.append(f'<line x1="{x0}" y1="{y:.1f}" x2="{x0+pw}" y2="{y:.1f}" stroke="#e5e7eb"/>')
-        svg.append(f'<text x="{x0-9}" y="{y+4:.1f}" text-anchor="end" font-family="sans-serif" font-size="12">{tick:g}</text>')
-    svg.append(f'<text x="{x0+pw/2}" y="{height-24}" text-anchor="middle" font-family="sans-serif" font-size="12">L</text>')
+        tick_offset = 7 if ppt else 4
+        svg.append(f'<text x="{x0-9}" y="{y+tick_offset:.1f}" text-anchor="end" font-family="sans-serif" font-size="{tick_font}">{tick:g}</text>')
+    xlabel_y = height - (8 if ppt else 24)
+    svg.append(f'<text x="{x0+pw/2}" y="{xlabel_y}" text-anchor="middle" font-family="sans-serif" font-size="{axis_font}">L</text>')
     svg.append(
-        f'<text x="28" y="{y0+ph/2}" text-anchor="middle" font-family="sans-serif" font-size="12" '
-        f'transform="rotate(-90 28 {y0+ph/2})">χ/L²</text>'
+        f'<text x="{ylabel_x}" y="{y0+ph/2}" text-anchor="middle" font-family="sans-serif" font-size="{axis_font}" '
+        f'transform="rotate(-90 {ylabel_x} {y0+ph/2})">χ/L²</text>'
     )
     bcs = {1.75: 0.329136, 1.875: 0.336985, 2.0: 0.344439, 2.5: 0.369446}
     for idx, sigma in enumerate(colors):
@@ -239,7 +359,7 @@ def eta_scaling_figure():
             ylo = sy(math.log10(max(value - err, 1e-300)), y0, ph, logy_min, logy_max)
             yhi = sy(math.log10(value + err), y0, ph, logy_min, logy_max)
             svg.append(f'<line x1="{x:.1f}" y1="{ylo:.1f}" x2="{x:.1f}" y2="{yhi:.1f}" stroke="{colors[sigma]}"/>')
-            svg.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{colors[sigma]}"/>')
+            svg.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{marker_radius}" fill="{colors[sigma]}"/>')
         fit_rows = [r for r in rows if int(r["L"]) >= 128]
         xs = [math.log(float(r["L"])) for r in fit_rows]
         ys = [
@@ -256,41 +376,119 @@ def eta_scaling_figure():
             x = x0 + (math.log2(length) - 6) / 3 * pw
             y = sy(math.log10(value), y0, ph, logy_min, logy_max)
             line.append((x, y))
+        dash_pattern = "8,5" if ppt else "6,4"
         svg.append(
             f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in line)}" '
-            f'fill="none" stroke="{colors[sigma]}" stroke-width="2" stroke-dasharray="6,4"/>'
+            f'fill="none" stroke="{colors[sigma]}" stroke-width="{line_width}" stroke-dasharray="{dash_pattern}"/>'
         )
-        ly = y0 + ph - 80 + idx * 20
-        legend_x = x0 + pw - 225
-        svg.append(f'<line x1="{legend_x}" y1="{ly}" x2="{legend_x+24}" y2="{ly}" stroke="{colors[sigma]}" stroke-width="3"/>')
+        legend_step = 27 if ppt else 20
+        ly = y0 + ph - (100 if ppt else 80) + idx * legend_step
+        legend_x = x0 + 24 if ppt else x0 + pw - 225
+        legend_line = 34 if ppt else 24
+        legend_stroke = 4 if ppt else 3
+        legend_text_x = legend_x + (43 if ppt else 31)
+        legend_text_y = ly + (8 if ppt else 4)
+        svg.append(f'<line x1="{legend_x}" y1="{ly}" x2="{legend_x+legend_line}" y2="{ly}" stroke="{colors[sigma]}" stroke-width="{legend_stroke}"/>')
         svg.append(
-            f'<text x="{legend_x+31}" y="{ly+4}" font-family="sans-serif" '
-            f'font-size="12">σ={sigma:g}, η={eta:.4f}</text>'
+            f'<text x="{legend_text_x}" y="{legend_text_y}" font-family="sans-serif" '
+            f'font-size="{legend_font}">σ={sigma:g}, η={eta:.4f}</text>'
         )
     svg.append("</svg>")
     return "\n".join(svg)
 
 
-def linearized_extrapolation_figure():
+def nn_eta_ppt_figure():
+    width, height = 720, 390
+    x0, y0, pw, ph = 112, 18, 580, 300
+    tick_font = axis_font = legend_font = 24
+    svg = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        '<rect width="100%" height="100%" fill="white"/>',
+        f'<rect x="{x0}" y="{y0}" width="{pw}" height="{ph}" fill="none" stroke="#555"/>',
+    ]
+    xmin, xmax = math.log2(64), math.log2(512)
+    ymin, ymax = math.log10(0.21), math.log10(0.42)
+    for length in (64, 128, 256, 512):
+        x = x0 + (math.log2(length) - xmin) / (xmax - xmin) * pw
+        svg.append(f'<text x="{x:.1f}" y="{y0+ph+26}" text-anchor="middle" font-family="sans-serif" font-size="{tick_font}">{length}</text>')
+    for tick in (0.22, 0.25, 0.30, 0.35, 0.40):
+        y = sy(math.log10(tick), y0, ph, ymin, ymax)
+        svg.append(f'<line x1="{x0}" y1="{y:.1f}" x2="{x0+pw}" y2="{y:.1f}" stroke="#e5e7eb"/>')
+        svg.append(f'<text x="{x0-10}" y="{y+8:.1f}" text-anchor="end" font-family="sans-serif" font-size="{tick_font}">{tick:.2f}</text>')
+    amplitude = nn_eta_fit["A"]
+    alpha = nn_eta_fit["alpha"]
+    eta = 2.0 + alpha
+    line_points = []
+    for step in range(101):
+        log_l = xmin + (xmax - xmin) * step / 100
+        length = 2**log_l
+        value = amplitude * length ** (-eta)
+        x = x0 + (log_l - xmin) / (xmax - xmin) * pw
+        y = sy(math.log10(value), y0, ph, ymin, ymax)
+        line_points.append((x, y))
+    svg.append(
+        f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x,y in line_points)}" '
+        'fill="none" stroke="#f97316" stroke-width="4"/>'
+    )
+    for row in nn_eta_rows:
+        length = int(row["L"])
+        value = float(row["chi"]) / length**2
+        error = float(row["err"]) / length**2
+        x = x0 + (math.log2(length) - xmin) / (xmax - xmin) * pw
+        y = sy(math.log10(value), y0, ph, ymin, ymax)
+        ylo = sy(math.log10(value - error), y0, ph, ymin, ymax)
+        yhi = sy(math.log10(value + error), y0, ph, ymin, ymax)
+        svg.append(f'<line x1="{x:.1f}" y1="{ylo:.1f}" x2="{x:.1f}" y2="{yhi:.1f}" stroke="#2563eb" stroke-width="2"/>')
+        svg.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6" fill="#2563eb"/>')
+    legend_x, legend_y = x0 + 25, y0 + ph - 95
+    svg.append(f'<line x1="{legend_x}" y1="{legend_y}" x2="{legend_x+34}" y2="{legend_y}" stroke="#f97316" stroke-width="4"/>')
+    svg.append(f'<text x="{legend_x+43}" y="{legend_y+8}" font-family="sans-serif" font-size="{legend_font}">fit</text>')
+    svg.append(f'<circle cx="{legend_x+8}" cy="{legend_y+32}" r="6" fill="#2563eb"/>')
+    svg.append(f'<text x="{legend_x+43}" y="{legend_y+40}" font-family="sans-serif" font-size="{legend_font}">data</text>')
+    svg.append(f'<text x="{x0+pw/2}" y="{height-8}" text-anchor="middle" font-family="sans-serif" font-size="{axis_font}">L</text>')
+    svg.append(
+        f'<text x="20" y="{y0+ph/2}" text-anchor="middle" font-family="sans-serif" font-size="{axis_font}" '
+        f'transform="rotate(-90 20 {y0+ph/2})">χ/L²</text>'
+    )
+    svg.append("</svg>")
+    return "\n".join(svg)
+
+
+def linearized_extrapolation_figure(obs_filter=None, boundary_only=False):
     width, height = 1120, 1080
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         '<rect width="100%" height="100%" fill="white"/>',
         '<text x="560" y="29" text-anchor="middle" font-family="sans-serif" font-size="18">修正变量线性化的热力学外推</text>',
     ]
-    rows = [
-        (1.875, "Rp", -0.45, 0.38),
-        (2.0, "Rp", -0.32, 0.75),
-        (1.875, "Qm", 0.72, 1.03),
-        (2.0, "Qm", 0.75, 1.08),
-    ]
+    if boundary_only:
+        rows = [
+            (1.75, "Rp", -0.70, 2.50),
+            (2.0, "Rp", -0.32, 0.75),
+            (1.75, "Qm", 0.68, 1.02),
+            (2.0, "Qm", 0.75, 1.08),
+        ]
+    else:
+        rows = [
+            (1.875, "Rp", -0.45, 0.38),
+            (2.0, "Rp", -0.32, 0.75),
+            (1.875, "Qm", 0.72, 1.03),
+            (2.0, "Qm", 0.75, 1.08),
+        ]
+    if obs_filter is not None:
+        rows = [row for row in rows if row[1] == obs_filter]
     for row, (sigma, obs, ymin, ymax) in enumerate(rows):
         data = sorted(
             (r for r in critical if float(r["sigma"]) == sigma and r["observable"] == obs),
             key=lambda r: int(r["L"]),
         )
         for col, model in enumerate(("power", "marginal")):
-            x0, y0, pw, ph = 105 + 525 * col, 55 + 255 * row, 430, 185
+            if obs_filter is not None:
+                # The PPT crop enlarges text by >2×. A wide central gutter
+                # prevents neighboring y labels and tick labels from colliding.
+                x0, y0, pw, ph = 120 + 560 * col, 55 + 255 * row, 360, 185
+            else:
+                x0, y0, pw, ph = 105 + 525 * col, 55 + 255 * row, 430, 185
             fit = next(
                 r for r in fits
                 if float(r["sigma"]) == sigma
@@ -310,11 +508,11 @@ def linearized_extrapolation_figure():
                 value = ymin + (ymax - ymin) * j / 4
                 y = sy(value, y0, ph, ymin, ymax)
                 svg.append(f'<line x1="{x0}" y1="{y:.1f}" x2="{x0+pw}" y2="{y:.1f}" stroke="#e5e7eb"/>')
-                svg.append(f'<text x="{x0-8}" y="{y+4:.1f}" text-anchor="end" font-family="sans-serif" font-size="12">{value:.2f}</text>')
+                svg.append(f'<text class="tick-label" x="{x0-8}" y="{y+4:.1f}" text-anchor="end" font-family="sans-serif" font-size="12">{value:.2f}</text>')
             for j in range(5):
                 value = xmax * j / 4
                 x = x0 + value / xmax * pw
-                svg.append(f'<text x="{x:.1f}" y="{y0+ph+22}" text-anchor="middle" font-family="sans-serif" font-size="12">{value:.2f}</text>')
+                svg.append(f'<text class="tick-label" x="{x:.1f}" y="{y0+ph+22}" text-anchor="middle" font-family="sans-serif" font-size="12">{value:.2f}</text>')
             color = "#0f766e" if model == "power" else "#c2410c"
             line_points = []
             for j in range(101):
@@ -345,7 +543,7 @@ def linearized_extrapolation_figure():
                 xlabel = '<tspan font-style="italic">L</tspan><tspan baseline-shift="super" font-size="8">−q</tspan>'
             else:
                 xlabel = '1/log(<tspan font-style="italic">L</tspan>/<tspan font-style="italic">q</tspan>)'
-            svg.append(f'<text x="{x0+pw/2}" y="{y0+ph+48}" text-anchor="middle" font-family="sans-serif" font-size="12">{xlabel}</text>')
+            svg.append(f'<text class="axis-label" x="{x0+pw/2}" y="{y0+ph+48}" text-anchor="middle" font-family="sans-serif" font-size="12">{xlabel}</text>')
             q_feature = 0.45 * xmax
             q_value = limit + p1 * q_feature
             qx = x0 + 0.45 * pw
@@ -362,36 +560,151 @@ def linearized_extrapolation_figure():
     return "\n".join(svg)
 
 
-def window_stability_figure():
+def crossing_curves_ppt_figure():
+    """Show how the reported beta_c values arise from the largest-size crossings."""
+    width, height = 1120, 590
+    svg = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        '<rect width="100%" height="100%" fill="white"/>',
+    ]
+    sigmas = (1.875, 2.0)
+    observables = ("Rp", "Qm")
+    size_colors = {64: "#94a3b8", 128: "#7c3aed", 256: "#2563eb", 512: "#dc2626"}
+    for row, obs in enumerate(observables):
+        for col, sigma in enumerate(sigmas):
+            x0, y0, pw, ph = 95 + 535 * col, 35 + 275 * row, 430, 195
+            rows = [
+                datum
+                for datum in base_rows
+                if float(datum["sigma"]) == sigma
+            ]
+            betas = sorted({float(datum["beta"]) for datum in rows})
+            xmin, xmax = min(betas), max(betas)
+            values = [float(datum[obs]) for datum in rows]
+            pad = 0.08 * (max(values) - min(values))
+            ymin, ymax = min(values) - pad, max(values) + pad
+
+            def px(beta):
+                return x0 + (beta - xmin) / (xmax - xmin) * pw
+
+            def py(value):
+                return y0 + ph - (value - ymin) / (ymax - ymin) * ph
+
+            svg.append(f'<rect x="{x0}" y="{y0}" width="{pw}" height="{ph}" fill="none" stroke="#64748b"/>')
+            for j in range(3):
+                beta = xmin + (xmax - xmin) * j / 2
+                x = px(beta)
+                svg.append(f'<line x1="{x:.1f}" y1="{y0+ph}" x2="{x:.1f}" y2="{y0+ph+5}" stroke="#64748b"/>')
+                svg.append(f'<text x="{x:.1f}" y="{y0+ph+24}" text-anchor="middle" font-family="sans-serif" font-size="22">{beta:.4f}</text>')
+            for j in range(3):
+                value = ymin + (ymax - ymin) * j / 2
+                y = py(value)
+                svg.append(f'<line x1="{x0}" y1="{y:.1f}" x2="{x0+pw}" y2="{y:.1f}" stroke="#e5e7eb"/>')
+                svg.append(f'<text x="{x0-9}" y="{y+7:.1f}" text-anchor="end" font-family="sans-serif" font-size="22">{value:.2f}</text>')
+
+            cross = next(
+                float(datum["beta_cross"])
+                for datum in crossing_rows
+                if float(datum["sigma"]) == sigma
+                and datum["observable"] == obs
+                and int(datum["L"]) == 256
+            )
+            cross_x = px(cross)
+            svg.append(
+                f'<line x1="{cross_x:.1f}" y1="{y0}" x2="{cross_x:.1f}" y2="{y0+ph}" '
+                'stroke="#0f766e" stroke-width="2" stroke-dasharray="7,5"/>'
+            )
+            svg.append(
+                f'<text x="{x0+pw-8}" y="{y0+21}" text-anchor="end" '
+                f'font-family="sans-serif" font-size="22" fill="#0f766e">βc={cross:.6f}</text>'
+            )
+
+            for length in (64, 128, 256, 512):
+                curve = sorted(
+                    (datum for datum in rows if int(datum["L"]) == length),
+                    key=lambda datum: float(datum["beta"]),
+                )
+                points = [(px(float(datum["beta"])), py(float(datum[obs]))) for datum in curve]
+                curve_betas = [float(datum["beta"]) for datum in curve]
+                curve_values = [float(datum[obs]) for datum in curve]
+                beta_mean = sum(curve_betas) / len(curve_betas)
+                value_mean = sum(curve_values) / len(curve_values)
+                slope = sum(
+                    (beta - beta_mean) * (value - value_mean)
+                    for beta, value in zip(curve_betas, curve_values)
+                ) / sum((beta - beta_mean) ** 2 for beta in curve_betas)
+                intercept = value_mean - slope * beta_mean
+                fit_points = [
+                    (px(beta), py(intercept + slope * beta))
+                    for beta in (xmin, xmax)
+                ]
+                svg.append(
+                    f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in fit_points)}" '
+                    f'fill="none" stroke="{size_colors[length]}" stroke-width="2.5"/>'
+                )
+                for x, y in points:
+                    svg.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{size_colors[length]}"/>')
+
+            svg.append(f'<text x="{x0+8}" y="{y0+22}" font-family="sans-serif" font-size="22">σ={sigma:g}, {obs}</text>')
+            svg.append(f'<text x="{x0+pw/2}" y="{y0+ph+49}" text-anchor="middle" font-family="sans-serif" font-size="22">β</text>')
+            svg.append(
+                f'<text x="{x0-61}" y="{y0+ph/2}" text-anchor="middle" font-family="sans-serif" '
+                f'font-size="22" transform="rotate(-90 {x0-61} {y0+ph/2})">{obs}(β)</text>'
+            )
+
+    legend_y = height - 12
+    for i, length in enumerate((64, 128, 256, 512)):
+        x = 315 + i * 135
+        svg.append(f'<line x1="{x}" y1="{legend_y-5}" x2="{x+28}" y2="{legend_y-5}" stroke="{size_colors[length]}" stroke-width="3"/>')
+        svg.append(f'<text x="{x+36}" y="{legend_y}" font-family="sans-serif" font-size="22">L={length}</text>')
+    svg.append("</svg>")
+    return "\n".join(svg)
+
+
+def window_stability_figure(obs_filter=None, boundary_only=False):
     width, height = 1120, 750
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         '<rect width="100%" height="100%" fill="white"/>',
         '<text x="560" y="27" text-anchor="middle" font-family="sans-serif" font-size="18">热力学外推极限的拟合窗口稳定性</text>',
     ]
-    panels = [
-        (1.875, "Rp", "σ=1.875", -0.25, 2.9),
-        (2.0, "Rp", "σ=2.0", -0.25, 2.3),
-        (1.875, "Qm", "σ=1.875", 0.75, 1.45),
-        (2.0, "Qm", "σ=2.0", 0.75, 1.65),
-    ]
+    if boundary_only:
+        panels = [
+            (1.75, "Rp", "σ=1.75", -0.25, 2.9),
+            (2.0, "Rp", "σ=2.0", -0.25, 2.3),
+            (1.75, "Qm", "σ=1.75", 0.75, 1.45),
+            (2.0, "Qm", "σ=2.0", 0.75, 1.65),
+        ]
+    else:
+        panels = [
+            (1.875, "Rp", "σ=1.875", -0.25, 2.9),
+            (2.0, "Rp", "σ=2.0", -0.25, 2.3),
+            (1.875, "Qm", "σ=1.875", 0.75, 1.45),
+            (2.0, "Qm", "σ=2.0", 0.75, 1.65),
+        ]
+    if obs_filter is not None:
+        panels = [panel for panel in panels if panel[1] == obs_filter]
     model_style = {"power": ("#0f766e", "circle"), "marginal": ("#c2410c", "square")}
     lmins = [64, 128, 256, 512]
     for p, (sigma, obs, title, ymin, ymax) in enumerate(panels):
         col, row = p % 2, p // 2
-        x0, y0, pw, ph = 105 + 525 * col, 55 + 345 * row, 430, 255
+        if obs_filter is not None:
+            # Match the extrapolation panels' projector-safe horizontal spacing.
+            x0, y0, pw, ph = 120 + 560 * col, 55 + 345 * row, 360, 255
+        else:
+            x0, y0, pw, ph = 105 + 525 * col, 55 + 345 * row, 430, 255
         svg.append(f'<rect x="{x0}" y="{y0}" width="{pw}" height="{ph}" fill="none" stroke="#555"/>')
         for i, lmin in enumerate(lmins):
             x = x0 + 35 + i * (pw - 70) / 3
             svg.append(f'<line x1="{x:.1f}" y1="{y0+ph}" x2="{x:.1f}" y2="{y0+ph+5}" stroke="#555"/>')
-            svg.append(f'<text x="{x:.1f}" y="{y0+ph+21}" text-anchor="middle" font-family="sans-serif" font-size="12">{lmin}</text>')
+            svg.append(f'<text class="tick-label" x="{x:.1f}" y="{y0+ph+21}" text-anchor="middle" font-family="sans-serif" font-size="12">{lmin}</text>')
         for j in range(5):
             value = ymin + (ymax - ymin) * j / 4
             y = sy(value, y0, ph, ymin, ymax)
             svg.append(f'<line x1="{x0}" y1="{y:.1f}" x2="{x0+pw}" y2="{y:.1f}" stroke="#e5e7eb"/>')
-            svg.append(f'<text x="{x0-7}" y="{y+4:.1f}" text-anchor="end" font-family="sans-serif" font-size="12">{value:.2f}</text>')
+            svg.append(f'<text class="tick-label" x="{x0-7}" y="{y+4:.1f}" text-anchor="end" font-family="sans-serif" font-size="12">{value:.2f}</text>')
         svg.append(f'<text x="{x0+8}" y="{y0+18}" font-family="sans-serif" font-size="12">{title}</text>')
-        svg.append(f'<text x="{x0+pw/2}" y="{y0+ph+39}" text-anchor="middle" font-family="sans-serif" font-size="16">Lₘᵢₙ</text>')
+        svg.append(f'<text class="axis-label" x="{x0+pw/2}" y="{y0+ph+39}" text-anchor="middle" font-family="sans-serif" font-size="16">Lₘᵢₙ</text>')
         ylabel = "Rₚ,∞" if obs == "Rp" else "Qₘ,∞"
         svg.append(
             f'<text x="{x0-52}" y="{y0+ph/2}" text-anchor="middle" font-family="sans-serif" '
@@ -427,10 +740,15 @@ def window_stability_figure():
                 f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in points)}" '
                 f'fill="none" stroke="{color}" stroke-width="2"/>'
             )
-        svg.append(f'<circle cx="{x0+245}" cy="{y0+17}" r="4" fill="#0f766e"/>')
-        svg.append(f'<text x="{x0+254}" y="{y0+21}" font-family="sans-serif" font-size="12">power</text>')
-        svg.append(f'<rect x="{x0+355}" y="{y0+13}" width="8" height="8" fill="#c2410c"/>')
-        svg.append(f'<text x="{x0+369}" y="{y0+21}" font-family="sans-serif" font-size="12">log</text>')
+        # Keep the enlarged PPT legend fully inside the narrower filtered panels.
+        if obs_filter is not None:
+            power_x, log_x = x0 + 205, x0 + 300
+        else:
+            power_x, log_x = x0 + 245, x0 + 355
+        svg.append(f'<circle cx="{power_x}" cy="{y0+17}" r="4" fill="#0f766e"/>')
+        svg.append(f'<text x="{power_x+9}" y="{y0+21}" font-family="sans-serif" font-size="12">power</text>')
+        svg.append(f'<rect x="{log_x}" y="{y0+13}" width="8" height="8" fill="#c2410c"/>')
+        svg.append(f'<text x="{log_x+14}" y="{y0+21}" font-family="sans-serif" font-size="12">log</text>')
     svg.append("</svg>")
     return "\n".join(svg)
 
@@ -495,7 +813,7 @@ def distinguishability_figure():
     return "\n".join(svg)
 
 
-def extension_extrapolation_figure():
+def extension_extrapolation_figure(obs_filter=None, boundary_only=False):
     width, height = 1120, 1080
     rendered_label_font = 10.0 * width / 660.0
     label_ascent = 0.82 * rendered_label_font
@@ -617,19 +935,33 @@ def extension_extrapolation_figure():
         '<rect width="100%" height="100%" fill="white"/>',
         '<text x="560" y="29" text-anchor="middle" font-family="sans-serif" font-size="18">大尺寸数据与完整窗口的线性化外推</text>',
     ]
-    rows = [
-        (1.875, "Rp", -0.45, 0.75),
-        (2.0, "Rp", -0.35, 3.25),
-        (1.875, "Qm", 0.72, 1.10),
-        (2.0, "Qm", 0.75, 1.85),
-    ]
+    if boundary_only:
+        rows = [
+            (1.75, "Rp", -0.70, 2.60),
+            (2.0, "Rp", -0.35, 3.25),
+            (1.75, "Qm", 0.68, 1.02),
+            (2.0, "Qm", 0.75, 1.85),
+        ]
+    else:
+        rows = [
+            (1.875, "Rp", -0.45, 0.75),
+            (2.0, "Rp", -0.35, 3.25),
+            (1.875, "Qm", 0.72, 1.10),
+            (2.0, "Qm", 0.75, 1.85),
+        ]
+    if obs_filter is not None:
+        rows = [row for row in rows if row[1] == obs_filter]
     for row, (sigma, obs, ymin, ymax) in enumerate(rows):
         all_data = sorted(
             (r for r in critical if float(r["sigma"]) == sigma and r["observable"] == obs),
             key=lambda r: int(r["L"]),
         )
         for col, model in enumerate(("power", "marginal")):
-            x0, y0, pw, ph = 105 + 525 * col, 55 + 255 * row, 430, 185
+            if obs_filter is not None:
+                # Match the competing-fit panels' projector-safe spacing.
+                x0, y0, pw, ph = 120 + 560 * col, 55 + 255 * row, 360, 185
+            else:
+                x0, y0, pw, ph = 105 + 525 * col, 55 + 255 * row, 430, 185
             clip_id = f"extension-panel-{row}-{col}"
             svg.append(
                 f'<defs><clipPath id="{clip_id}"><rect x="{x0}" y="{y0}" '
@@ -640,9 +972,10 @@ def extension_extrapolation_figure():
             all_features = []
             for maxL in (2048,):
                 fit = next(
-                    r for r in extension_fits
+                    r for r in extension_fits + fits
                     if float(r["sigma"]) == sigma
                     and r["observable"] == obs
+                    and int(r["Lmin"]) == 64
                     and int(r["Lmax"]) == maxL
                     and r["model"] == model
                 )
@@ -662,11 +995,11 @@ def extension_extrapolation_figure():
                 value = ymin + (ymax - ymin) * j / 4
                 y = sy(value, y0, ph, ymin, ymax)
                 svg.append(f'<line x1="{x0}" y1="{y:.1f}" x2="{x0+pw}" y2="{y:.1f}" stroke="#e5e7eb"/>')
-                svg.append(f'<text x="{x0-8}" y="{y+4:.1f}" text-anchor="end" font-family="sans-serif" font-size="12">{value:.2f}</text>')
+                svg.append(f'<text class="tick-label" x="{x0-8}" y="{y+4:.1f}" text-anchor="end" font-family="sans-serif" font-size="12">{value:.2f}</text>')
             for j in range(5):
                 value = xmax * j / 4
                 x = x0 + value / xmax * pw
-                svg.append(f'<text x="{x:.1f}" y="{y0+ph+22}" text-anchor="middle" font-family="sans-serif" font-size="12">{value:.2f}</text>')
+                svg.append(f'<text class="tick-label" x="{x:.1f}" y="{y0+ph+22}" text-anchor="middle" font-family="sans-serif" font-size="12">{value:.2f}</text>')
             marker_points = []
             label_specs = []
             for maxL, color, dash in ((2048, "#2563eb", ""),):
@@ -731,7 +1064,7 @@ def extension_extrapolation_figure():
                 xlabel = '<tspan font-style="italic">L</tspan><tspan baseline-shift="super" font-size="8">−q</tspan>'
             else:
                 xlabel = '1/log(<tspan font-style="italic">L</tspan>/<tspan font-style="italic">q</tspan>)'
-            svg.append(f'<text x="{x0+pw/2}" y="{y0+ph+48}" text-anchor="middle" font-family="sans-serif" font-size="12">{xlabel}</text>')
+            svg.append(f'<text class="axis-label" x="{x0+pw/2}" y="{y0+ph+48}" text-anchor="middle" font-family="sans-serif" font-size="12">{xlabel}</text>')
             svg.append(
                 f'<text x="{x0-55}" y="{y0+ph/2}" text-anchor="middle" font-family="sans-serif" '
                 f'font-size="12" transform="rotate(-90 {x0-55} {y0+ph/2})">{ylabel}(L)</text>'
@@ -745,6 +1078,8 @@ outputs = {
         finite_size_figure(), 1120
     ),
     "eta_scaling.svg": match_figure_two_font_scale(eta_scaling_figure(), 900),
+    "eta_scaling_ppt.svg": eta_scaling_figure(ppt=True),
+    "nn_eta_ppt.svg": nn_eta_ppt_figure(),
     "competing_extrapolations.svg": match_figure_two_font_scale(
         linearized_extrapolation_figure(), 1120
     ),
@@ -756,6 +1091,70 @@ outputs = {
     ),
     "extension_extrapolation.svg": match_figure_two_font_scale(
         extension_extrapolation_figure(), 1120
+    ),
+    "critical_finite_size_extended_ppt.svg": ppt_crop(
+        finite_size_figure(ppt=True),
+        35,
+        395,
+        rotated_font=22,
+        rotated_x_shift=-20,
+    ),
+    "competing_extrapolations_rp_ppt.svg": ppt_crop(
+        linearized_extrapolation_figure("Rp", boundary_only=True),
+        35,
+        530,
+        tick_font=22,
+        axis_font=29,
+        rotated_font=25,
+        rotated_x_shift=-30,
+    ),
+    "competing_extrapolations_qm_ppt.svg": ppt_crop(
+        linearized_extrapolation_figure("Qm", boundary_only=True),
+        35,
+        530,
+        tick_font=22,
+        axis_font=29,
+        rotated_font=25,
+        rotated_x_shift=-30,
+    ),
+    "extrapolation_window_stability_rp_ppt.svg": ppt_crop(
+        window_stability_figure("Rp", boundary_only=True),
+        35,
+        335,
+        tick_font=22,
+        axis_font=24,
+        rotated_font=21,
+        rotated_x_shift=-30,
+    ),
+    "extrapolation_window_stability_qm_ppt.svg": ppt_crop(
+        window_stability_figure("Qm", boundary_only=True),
+        35,
+        335,
+        tick_font=22,
+        axis_font=24,
+        rotated_font=21,
+        rotated_x_shift=-30,
+    ),
+    "distinguishability_forecast_ppt.svg": ppt_crop(
+        distinguishability_figure(), 35, 435
+    ),
+    "extension_extrapolation_rp_ppt.svg": ppt_crop(
+        extension_extrapolation_figure("Rp", boundary_only=True),
+        35,
+        530,
+        tick_font=22,
+        axis_font=29,
+        rotated_font=25,
+        rotated_x_shift=-30,
+    ),
+    "extension_extrapolation_qm_ppt.svg": ppt_crop(
+        extension_extrapolation_figure("Qm", boundary_only=True),
+        35,
+        530,
+        tick_font=22,
+        axis_font=29,
+        rotated_font=25,
+        rotated_x_shift=-30,
     ),
 }
 
