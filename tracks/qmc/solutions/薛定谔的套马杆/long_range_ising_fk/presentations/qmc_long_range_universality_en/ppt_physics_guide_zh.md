@@ -1,4 +1,4 @@
-# 2D 长程 Ising 普适性边界：PPT 逐页物理解读
+# 2D Ising：长程普适性边界——PPT 逐页物理解读
 
 本文对应英文汇报 `qmc_long_range_universality_en.pdf` 的当前版本。PDF
 共 27 页：第 1 页是封面，其后页脚编号为 1/26–26/26。下文同时标出

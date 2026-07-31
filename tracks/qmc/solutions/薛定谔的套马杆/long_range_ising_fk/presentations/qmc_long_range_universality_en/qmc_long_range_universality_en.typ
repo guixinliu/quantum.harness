@@ -6,7 +6,7 @@
 
 #let pal = palettes.academic
 #show: themes.academic.with(config-info(
-  title: [2D Long-Range Ising Universality Boundary],
+  title: [2D Ising: long-range universality boundary],
   subtitle: [],
   author: [Gui-Xin Liu, ShanghaiTech University; Hao-Yu Lu, Hong Kong University],
   date: [2026-07-30],
