@@ -689,8 +689,8 @@ def window_stability_figure(obs_filter=None, boundary_only=False):
     for p, (sigma, obs, title, ymin, ymax) in enumerate(panels):
         col, row = p % 2, p // 2
         if obs_filter is not None:
-            # Match the extrapolation panels' projector-safe horizontal spacing.
-            x0, y0, pw, ph = 120 + 560 * col, 55 + 345 * row, 360, 255
+            # Use most of the PPT canvas: a narrow central gutter and wider axes.
+            x0, y0, pw, ph = 75 + 525 * col, 55 + 345 * row, 420, 255
         else:
             x0, y0, pw, ph = 105 + 525 * col, 55 + 345 * row, 430, 255
         svg.append(f'<rect x="{x0}" y="{y0}" width="{pw}" height="{ph}" fill="none" stroke="#555"/>')
@@ -742,7 +742,7 @@ def window_stability_figure(obs_filter=None, boundary_only=False):
             )
         # Keep the enlarged PPT legend fully inside the narrower filtered panels.
         if obs_filter is not None:
-            power_x, log_x = x0 + 205, x0 + 300
+            power_x, log_x = x0 + 280, x0 + 375
         else:
             power_x, log_x = x0 + 245, x0 + 355
         svg.append(f'<circle cx="{power_x}" cy="{y0+17}" r="4" fill="#0f766e"/>')

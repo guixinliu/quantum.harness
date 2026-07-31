@@ -319,103 +319,102 @@
 #v(6pt)
 #rail_pull[The direction of flow is resolved; its asymptotic boundary is not.]
 
-== Competing _$R_p$_ extrapolations
+== Competing _$R_p$_ and _$Q_m$_ extrapolations
 
 #grid(
-  columns: (455pt, 1fr),
-  column-gutter: 10pt,
+  columns: (1fr, 1fr),
+  column-gutter: 18pt,
   align: top,
-  align(left, image(
-    figdir + "/competing_extrapolations_rp_ppt_en.svg",
-    width: 455pt,
-    fit: "contain",
-  )),
   [
-    #v(12pt)
-    #text(size: 13pt)[
-      $"AICc" = -2 ln cal(L)_"max" + 2k + frac(2k(k+1), n-k-1)$
-    ]
-    #v(12pt)
-    #text(size: 12pt, fill: pal.text.lighten(30%))[
-      $n$: data points \
-      $k$: fitted parameters \
-      $cal(L)_"max"$: maximum likelihood
-    ]
-    #v(12pt)
-    #text(size: 14pt)[Lower AICc is preferred.]
+    #figbox([Figure 4a · Competing $R_p$ extrapolations],
+      align(center, image(
+        figdir + "/competing_extrapolations_rp_ppt_en.svg",
+        width: 392pt,
+        fit: "contain",
+      )))
+  ],
+  [
+    #figbox([Figure 4b · Competing $Q_m$ extrapolations],
+      align(center, image(
+        figdir + "/competing_extrapolations_qm_ppt_en.svg",
+        width: 392pt,
+        fit: "contain",
+      )))
   ],
 )
 
 #v(8pt)
-#rail_pull[$sigma=1.75$: power has lower AICc, but $chi^2/"dof"=7.1$ and $R_(p,infinity)=2.27$ make the limit noncredible. $sigma=2$: $abs(Delta "AICc")=0.06$ leaves the endpoint ambiguous.]
+#rail_pull[Over the currently accessible finite-size range, the $R_p$ and $Q_m$ data cannot distinguish power-law from logarithmic corrections.]
 
-== Competing _$Q_m$_ extrapolations
+== _$R_p$_ and _$Q_m$_ intercepts are not _window-stable_
 
-#figbox([Figure 4b · Competing $Q_m$ extrapolations],
-  align(center, image(figdir + "/competing_extrapolations_qm_ppt_en.svg", height: 225pt, fit: "contain")),
-  caption: [At the two candidate boundaries, $sigma=1.75$ and $2.0$, $Q_m$ independently shows that neither visual linearity nor AICc selects a unique limit.])
-
-== The _$R_p$_ intercept is not window-stable
-
-#move(dy: -14pt, grid(
-  columns: (520pt, 1fr),
+#grid(
+  columns: (1fr, 1fr),
   column-gutter: 18pt,
-  align: horizon,
-  figbox([Figure 5a · $R_p$ extrapolation-window stability],
-    align(center, image(figdir + "/extrapolation_window_stability_rp_ppt_en.svg", width: 520pt, fit: "contain"))),
+  align: top,
   [
-    #align(left, text(size: 19pt)[
-      $R_p = chevron.l R_2 chevron.r - 2 chevron.l R_0 chevron.r$
-    ])
-    #v(18pt)
-    #align(left, text(size: 22pt, fill: pal.accent_deep)[
-      $-2 <= R_p <= 1$
-    ])
+    #figbox([Figure 5a · $R_p$ window stability],
+      align(center, image(
+        figdir + "/extrapolation_window_stability_rp_ppt_en.svg",
+        width: 392pt,
+        fit: "contain",
+      )))
+    #v(7pt)
+    #align(center)[
+      #text(size: 14pt)[$R_p = chevron.l R_2 chevron.r - 2 chevron.l R_0 chevron.r$]
+      #h(12pt)
+      #text(size: 15pt, fill: pal.accent_deep)[$-2 <= R_p <= 1$]
+    ]
   ],
-))
+  [
+    #figbox([Figure 5b · $Q_m$ window stability],
+      align(center, image(
+        figdir + "/extrapolation_window_stability_qm_ppt_en.svg",
+        width: 392pt,
+        fit: "contain",
+      )))
+    #v(7pt)
+    #align(center)[
+      #text(size: 14pt)[$Q_m = frac(chevron.l M^2 chevron.r^2, chevron.l M^4 chevron.r)$]
+      #h(12pt)
+      #text(size: 15pt, fill: pal.accent_deep)[$0 <= Q_m <= 1$]
+    ]
+  ],
+)
 
 #v(8pt)
-#rail_pull[A determined thermodynamic limit would remain stable as small sizes are removed. Instead, $R_(p,infinity)$ shifts strongly with the fit window, showing that the correction law—not the precision of individual Monte Carlo points—limits the inference.]
+#rail_pull[Removing small sizes destabilizes both extrapolated limits; model and fit-window dependence—not raw Monte Carlo precision—limits the inference.]
 
-== The _$Q_m$_ intercept is not window-stable
+== Large-size _$R_p$_ and _$Q_m$_ fits remain _model-dependent_
 
-#move(dy: -14pt, grid(
-  columns: (520pt, 1fr),
+#grid(
+  columns: (1fr, 1fr),
   column-gutter: 18pt,
-  align: horizon,
-  figbox([Figure 5b · $Q_m$ extrapolation-window stability],
-    align(center, image(figdir + "/extrapolation_window_stability_qm_ppt_en.svg", width: 520pt, fit: "contain"))),
+  align: top,
   [
-    #align(left, text(size: 19pt)[
-      $Q_m = frac(chevron.l M^2 chevron.r^2, chevron.l M^4 chevron.r)$
-    ])
-    #v(18pt)
-    #align(left, text(size: 22pt, fill: pal.accent_deep)[
-      $0 <= Q_m <= 1$
-    ])
+    #figbox([Figure 6a · $R_p$ full-window fits],
+      align(center, image(
+        figdir + "/extension_extrapolation_rp_ppt_en.svg",
+        width: 392pt,
+        fit: "contain",
+      )))
+    #v(6pt)
+    #text(size: 13pt)[At $sigma=2$, larger sizes remove the worst power-fit pathology; $sigma=1.75$ remains ill-conditioned.]
   ],
-))
+  [
+    #figbox([Figure 6b · $Q_m$ full-window fits],
+      align(center, image(
+        figdir + "/extension_extrapolation_qm_ppt_en.svg",
+        width: 392pt,
+        fit: "contain",
+      )))
+    #v(6pt)
+    #text(size: 13pt)[The large-size $Q_m$ points shift the inferred limits, but power and logarithmic fits remain inconsistent.]
+  ],
+)
 
 #v(8pt)
-#rail_pull[The measured $Q_m(L)$ values are precise, but they do not constrain a unique asymptotic limit. Removing small sizes makes the three-parameter extrapolation ill-conditioned, so the intercept drifts and its bootstrap interval can expand sharply.]
-
-== Large-size _$R_p$_ fits remain _model-dependent_
-
-#figbox([Figure 6a · Large-size $R_p$ points and full-window fits],
-  align(center, image(figdir + "/extension_extrapolation_rp_ppt_en.svg", height: 225pt, fit: "contain")),
-  caption: [Only $L=768,1024,1536,2048$ points are shown; full-window fits move the pathological $sigma=2.0$ power intercept from $R_(p,infinity)=3.06$ to $0.257$.])
-
-#v(6pt)
-#rail_pull[At $sigma=2$, larger sizes remove the worst power-fit pathology; $sigma=1.75$ remains ill-conditioned. At neither boundary do power and log agree.]
-
-== Large-size _$Q_m$_ fits remain _model-dependent_
-
-#figbox([Figure 6b · Large-size $Q_m$ points and full-window fits],
-  align(center, image(figdir + "/extension_extrapolation_qm_ppt_en.svg", height: 225pt, fit: "contain")),
-  caption: [Only $L=768,1024,1536,2048$ points are shown; $Q_(m,infinity)$ moves from $1.76$ to $0.922$, but power and log limits still disagree.])
-
-#v(6pt)
-#rail_pull[At both candidate boundaries, the large-size $Q_m$ points do not reconcile the power and logarithmic limits.]
+#rail_pull[Adding $L=768,1024,1536,2048$ improves conditioning but does not select a unique thermodynamic limit from either observable.]
 
 = Discrimination and validation limits
 
