@@ -1,5 +1,6 @@
 // QMC finite-size study of the 2D long-range Ising universality boundary
-// Build: typst compile qmc_long_range_universality_zh.typ qmc_long_range_universality.pdf
+// Build from the solution directory:
+// typst compile --root ../../../../.. --font-path presentations/qmc_long_range_universality_en/fonts presentations/qmc_long_range_universality_en/qmc_long_range_universality_en.typ presentations/qmc_long_range_universality_en/qmc_long_range_universality_en.pdf
 
 #import "zoo/lib.typ": *
 
